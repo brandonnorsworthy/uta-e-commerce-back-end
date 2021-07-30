@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
 	// find a single tag by its `id`
 	try {
-		const data = await Tag.findByPk( req.params.id, {
+		const data = await Tag.findByPk(req.params.id, {
 			include: { model: Product },
 		});
 		if (!data) {
@@ -35,12 +35,38 @@ router.get('/:id', async (req, res) => {
 	// be sure to include its associated Product data
 });
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
 	// create a new tag
+	try {
+		const data = await Tag.create({
+			product_id: req.body.product_id,
+		});
+		if (!data) {
+			res.status(404).json({ message: 'No Tag with this id!' });
+		}
+		res.status(200).json(data);
+	} catch (error) {
+		res.status(500).json(error);
+	}
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
 	// update a tag's name by its `id` value
+	try {
+		const data = await Tag.update(
+			{ tag_name: req.body.tag_name },
+			{
+				where: {
+					id: req.params.id,
+				},
+			});
+		if (!data) {
+			res.status(404).json({ message: 'No Tag with this id!' });
+		}
+		res.status(200).json(data);
+	} catch (error) {
+		res.status(500).json(error);
+	}
 });
 
 router.delete('/:id', (req, res) => {
